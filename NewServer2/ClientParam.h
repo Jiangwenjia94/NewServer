@@ -15,7 +15,7 @@ struct USER
 	char user_num[64];//唯一用户编号
 	std::vector<ORDER> user_order;//使用队列存储每个用户的指令
 	bool isfirt = true;
-	int index;//在client中的下标
+	int index = -1;//在client中的下标
 };
 
 struct ClientParam

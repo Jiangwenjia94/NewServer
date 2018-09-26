@@ -163,30 +163,30 @@ int DataJudgment::recvCurHrt(ClientParam *param,bool fir)
 	int sen = 0;
 	int rec = 0;
 	
-	
 	if (fir == true/*(*m_client)[user->index].isfirt*/)
 	{
 		memset(user->user_num, 0, sizeof(user->user_num));
-		cout<<"第一次连接"<<endl;
+		cout << "第一次连接" << endl;
 		rec = Trans.Recv(r_order);
-		if(rec <= 0 || r_order != C_LINK)
+		if (rec <= 0 || r_order != C_LINK)
 			return -9999;//未收到验证消息
 		s_order = S_LINK;
 		sen = Trans.Send(s_order);
- 		if(sen <= 0)
+		if (sen <= 0)
 			return -9998;
-		rec = Trans.Recv(user->user_num,64);//接收64字节用户编号于user_num中
-		if(rec != 64)
+		rec = Trans.Recv(user->user_num, 64);//接收64字节用户编号于user_num中
+		if (rec != 64)
 			return -9999;//用户编号不对
 		sen = Trans.Send(user->user_num, 64);//回发用户编号
-		
-		Push(*user,*m_client);
-		cout <<"index: " <<user->index << endl;
-		if(sen <= 0)
+
+		Push(*user, *m_client);
+		cout << "index: " << user->index << endl;
+		if (sen <= 0)
 			return -9998;
 		is_identify = true;
 		cout << "验证通过" << endl;
 	}
+
 	if( r_order == C_LINK && is_identify) //验证通过
 	{
 		
@@ -439,16 +439,17 @@ int DataJudgment::recvCurHrt(ClientParam *param,bool fir)
 	//	if((s_order == S_HEART_LIVE_FEED && r_order == C_HEART_LIVE_NOTICE) || (s_order == S_HEART_LIVE_FEED && r_order == C_HEART_IMAGE_SUCCESS))//恢复心跳回应
 		if(s_order == S_HEART_LIVE_FEED && (r_order == C_HEART_LIVE_NOTICE || r_order == C_HEART_IMAGE_SUCCESS || r_order == C_HEART_IMAGE_ASK || r_order == C_HEART_NOTIC_SUCCESS))
 		{			//完成一次switch后恢复心跳
-			rec = Trans.Recv(r_order);
-			if (rec <= -1)
-				return REC_ERROR_OFFLINE;//主动关闭客户端、断网
-			else if (rec == 0)
-				return REC_ERROR_CLOSE;//使用CloseSocket关闭连接
+			//rec = Trans.Recv(r_order);
+			//if (rec <= -1)
+			//	return REC_ERROR_OFFLINE;//主动关闭客户端、断网
+			//else if (rec == 0)
+			//	return REC_ERROR_CLOSE;//使用CloseSocket关闭连接
 
-			cout<<"心跳连接2"<<endl;
-			sen = Trans.Send(s_order);
- 			if(sen <= 0)
-				return SEN_ERROR;
+			//cout<<"心跳连接2"<<endl;
+			//sen = Trans.Send(s_order);
+ 		//	if(sen <= 0)
+			//	return SEN_ERROR;
+			return 0;
 		}
 		else if(s_order == S_HEART_IMAGE_READLY || s_order == S_HEART_NOTIC_READLY)
 		{

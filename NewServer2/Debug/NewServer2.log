@@ -1,5 +1,41 @@
-﻿生成启动时间为 2018/9/17 星期一 16:42:53。
+﻿生成启动时间为 2018/9/18 星期二 9:39:29。
+     1>项目“H:\Visual Studio 2013\Projects\NewServer2\NewServer2\NewServer2.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         E:\software\VisualStudio2013\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt DataJudgment.cpp
+         DataJudgment.cpp
+         _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+     1>h:\visual studio 2013\projects\newserver2\newserver2\datajudgment.cpp(40): warning C4018: “<”: 有符号/无符号不匹配
+     1>h:\visual studio 2013\projects\newserver2\newserver2\datajudgment.cpp(87): warning C4018: “<”: 有符号/无符号不匹配
+     1>h:\visual studio 2013\projects\newserver2\newserver2\datajudgment.cpp(91): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 e:\software\visualstudio2013\vc\include\string.h(195) : 参见“strncpy”的声明
+     1>h:\visual studio 2013\projects\newserver2\newserver2\datajudgment.cpp(95): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 e:\software\visualstudio2013\vc\include\string.h(195) : 参见“strncpy”的声明
+     1>h:\visual studio 2013\projects\newserver2\newserver2\datajudgment.cpp(100): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 e:\software\visualstudio2013\vc\include\string.h(195) : 参见“strncpy”的声明
+     1>h:\visual studio 2013\projects\newserver2\newserver2\datajudgment.cpp(103): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 e:\software\visualstudio2013\vc\include\stdio.h(356) : 参见“sprintf”的声明
+     1>h:\visual studio 2013\projects\newserver2\newserver2\datajudgment.cpp(107): warning C4172: 返回局部变量或临时变量的地址
+     1>h:\visual studio 2013\projects\newserver2\newserver2\datajudgment.cpp(149): warning C4018: “<”: 有符号/无符号不匹配
+     1>h:\visual studio 2013\projects\newserver2\newserver2\datajudgment.cpp(359): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 e:\software\visualstudio2013\vc\include\string.h(195) : 参见“strncpy”的声明
+     1>h:\visual studio 2013\projects\newserver2\newserver2\datajudgment.cpp(409): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+     1>h:\visual studio 2013\projects\newserver2\newserver2\datajudgment.cpp(410): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+     1>h:\visual studio 2013\projects\newserver2\newserver2\datajudgment.cpp(478): warning C4244: “初始化”: 从“ULONGLONG”转换到“int”，可能丢失数据
+       Link:
+         E:\software\VisualStudio2013\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"H:\Visual Studio 2013\Projects\NewServer2\Debug\NewServer2.exe" /INCREMENTAL /NOLOGO /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:E:\software\VisualStudio2013\VC\Include\Manifest\dpiaware.manifest /DEBUG /PDB:"H:\Visual Studio 2013\Projects\NewServer2\Debug\NewServer2.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"H:\Visual Studio 2013\Projects\NewServer2\Debug\NewServer2.lib" /MACHINE:X86 Debug\NewServer2.res
+         Debug\BluetoohServer.obj
+         Debug\DataExPortable.obj
+         Debug\DataJudgment.obj
+         Debug\LogEvent.obj
+         Debug\LuojiaOrbit.obj
+         Debug\main.obj
+         Debug\Orbit.obj
+         Debug\SocketThread.obj
+         Debug\SocketTrans.obj
+         Debug\stdafx.obj
+         NewServer2.vcxproj -> H:\Visual Studio 2013\Projects\NewServer2\Debug\NewServer2.exe
+     1>已完成生成项目“H:\Visual Studio 2013\Projects\NewServer2\NewServer2\NewServer2.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:00.28
+已用时间 00:00:03.45
