@@ -1,0 +1,41 @@
+﻿生成启动时间为 2018/10/15 星期一 21:05:26。
+     1>项目“H:\Visual Studio 2013\Projects\NewServer2\NewServer2\NewServer2.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         E:\software\VisualStudio2013\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /sdl- /Od /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt DataJudgment.cpp
+         DataJudgment.cpp
+         _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+     1>DataJudgment.cpp(85): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+     1>DataJudgment.cpp(91): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 E:\software\VisualStudio2013\VC\include\string.h(195) : 参见“strncpy”的声明
+     1>DataJudgment.cpp(95): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 E:\software\VisualStudio2013\VC\include\string.h(195) : 参见“strncpy”的声明
+     1>DataJudgment.cpp(100): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 E:\software\VisualStudio2013\VC\include\string.h(195) : 参见“strncpy”的声明
+     1>DataJudgment.cpp(103): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 E:\software\VisualStudio2013\VC\include\stdio.h(356) : 参见“sprintf”的声明
+     1>DataJudgment.cpp(107): warning C4172: 返回局部变量或临时变量的地址
+     1>DataJudgment.cpp(424): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 E:\software\VisualStudio2013\VC\include\string.h(195) : 参见“strncpy”的声明
+     1>DataJudgment.cpp(474): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+     1>DataJudgment.cpp(475): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+     1>DataJudgment.cpp(543): warning C4244: “初始化”: 从“ULONGLONG”转换到“int”，可能丢失数据
+     1>h:\visual studio 2013\projects\newserver2\newserver2\datajudgment.cpp(481): warning C4789: 缓冲区“pos”(大小为 24 字节)将溢出；8 字节将在偏移 24 时开始写入
+       Link:
+         E:\software\VisualStudio2013\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"H:\Visual Studio 2013\Projects\NewServer2\x64\Debug\NewServer2.exe" /INCREMENTAL /NOLOGO libmysql.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:E:\software\VisualStudio2013\VC\Include\Manifest\dpiaware.manifest /DEBUG /PDB:"H:\Visual Studio 2013\Projects\NewServer2\x64\Debug\NewServer2.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"H:\Visual Studio 2013\Projects\NewServer2\x64\Debug\NewServer2.lib" /MACHINE:X64 x64\Debug\NewServer2.res
+         x64\Debug\BluetoohServer.obj
+         x64\Debug\Database.obj
+         x64\Debug\DataExPortable.obj
+         x64\Debug\DataJudgment.obj
+         x64\Debug\LogEvent.obj
+         x64\Debug\LuojiaOrbit.obj
+         x64\Debug\main.obj
+         x64\Debug\Orbit.obj
+         x64\Debug\SocketThread.obj
+         x64\Debug\SocketTrans.obj
+         x64\Debug\stdafx.obj
+         NewServer2.vcxproj -> H:\Visual Studio 2013\Projects\NewServer2\x64\Debug\NewServer2.exe
+     1>已完成生成项目“H:\Visual Studio 2013\Projects\NewServer2\NewServer2\NewServer2.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:01.77

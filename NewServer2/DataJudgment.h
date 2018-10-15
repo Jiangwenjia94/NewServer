@@ -4,6 +4,7 @@
 #include "LuojiaOrbit.h"
 #include <vector>
 #include <fstream>
+#include "Database.h"
 #define MAX_SIZE_LENGTH					  1000
 #define CXN_SUCCESS                       0
 #define CXN_ERROR                         1
@@ -54,6 +55,7 @@ public:
 	
 	int		getOrderNum();//获取当前待发送的order num
 	CString getOrderInfo(int ordernum);//获取当前待发送的order info
+	bool	getOrderInfo(int ordernum,char *(&buffer));//获取当前待发送的order info
 	void	setOrdersta(int ordernum,int sta);
 
 	bool	isSame(char *strA,char *strB);
@@ -74,7 +76,7 @@ public:
 	bool is_identify;
 
 private:
-
+	Database db;
 	static UINT sendCurrentPic(ClientParam *param, CString Path); //unuse
 	
 	void  reset();

@@ -6,12 +6,12 @@ using namespace std;
 
 DataJudgment::DataJudgment(void)
 {
-	bPictureReady = false; //for S_HEART_IMAGE_READLY 3
+	bPictureReady = true; //for S_HEART_IMAGE_READLY 3
 	bNoticeReady = false;
 	bPictureRecv = true;
 	bNoticeRecv = true;
 	is_identify = false;
-
+	db.Connect();
 //	out.open("out.txt", ios::app | ios::out);
 }
 
@@ -144,6 +144,19 @@ CString DataJudgment::getOrderInfo(int ordernum)
 	return path;
 }
 
+bool DataJudgment::getOrderInfo(int ordernum, char *(&buffer))
+{
+	for (auto iter = user->user_order.cbegin(); iter != user->user_order.cend(); iter++)
+	{
+		if ((*iter).order_num == ordernum)
+		{
+			buffer = (*iter).order_info;
+			return true;
+		}
+	}
+	return true;
+}
+
 void DataJudgment::setOrdersta(int ordernum,int sta)
 {
 	for (int i = 0; i < user->user_order.size() ; i++)
@@ -178,9 +191,14 @@ int DataJudgment::recvCurHrt(ClientParam *param,bool fir)
 		if (rec != 64)
 			return -9999;//用户编号不对
 		sen = Trans.Send(user->user_num, 64);//回发用户编号
+		int ret = db.InsertIntoUser(9, 0, 9, user->user_num);
+		if (ret == 1) //存入错误
+			return 1;
+	//	else if (ret == 2) //数据库中已存在
 
+	//	cout <<"insert: "<< db.InsertIntoUser(9, 0, 9, user->user_num) << endl;;
 		Push(*user, *m_client);
-		cout << "index: " << user->index << endl;
+//		cout << "index: " << user->index << endl;
 		if (sen <= 0)
 			return -9998;
 		is_identify = true;
@@ -196,6 +214,10 @@ int DataJudgment::recvCurHrt(ClientParam *param,bool fir)
 //		int nNetTimeout = 5000;//5s 超时设置
 //		setsockopt(param->ClientSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&nNetTimeout, sizeof(int));
 		(*m_client)[user->index].isfirt = false;
+		if (db.UpdateUserIsfirst("1",user->user_num))
+			cout << "successed" << endl;
+		else
+			cout << "false" << endl;
 		rec = Trans.Recv(r_order);
 		cout << r_order << endl;//r_order存储收到的心跳信息
 		//超时rec返回-1
@@ -264,29 +286,63 @@ int DataJudgment::recvCurHrt(ClientParam *param,bool fir)
 				}
 				/*
 					此处增加指令的状态信息
-				*/
 
+				*/
+				cur_order.order_sta = "999";
 				//添加到USER.user_order Vector尾部中
 				user->user_order.push_back(cur_order);
 				(*m_client)[user->index] = *user;//同步client中的user
+				if (db.InsertIntoOrder(user->user_num, cur_order.order_num, cur_order.order_info, cur_order.order_sta, cur_order.is_send))
+					cout << "order insert successed" << endl;
+				else
+					cout << "order insert failed" << endl;
 				s_order = S_HEART_LIVE_FEED;
 				break;
 			}
 		case C_HEART_IMAGE_READLY:							
 		{
-			int curorder = 0;//上一步产生的唯一编号 
+			bool romexist = false;
+			bool dbexist = false;
+			int curorder = false;//上一步产生的唯一编号 
 			CString path;
-			curorder = getOrderNum();
-			s_order = curorder;
-			if (s_order != 0)
+			curorder = getOrderNum(); //先从内存中的容器查找
+			if (curorder != 0)
+			{
 				path = getOrderInfo(curorder);
+				romexist = true;
+			}
 
+			if (curorder == 0)// 内存容器内没有待发送图片，则从数据库中遍历查找未发送的图片
+			{
+				string *Info_Num;
+				if (db.GetReadyOrder(user->user_num, Info_Num))	//可能会获取多组，只取第一组
+				{
+					curorder = atoi(Info_Num[0].c_str());
+					path = Info_Num[1].c_str();
+					dbexist = true;
+					delete[] Info_Num;
+				}
+				
+			}
+
+			s_order = curorder;
+			if (s_order == 0)
+				break;
 			sen = Trans.Send(s_order);
 			if(sen <= 0)
 				break;
-			//orderinfo = "test.jpg";
-			setOrdersta(curorder, 2);
-			if (!user->user_order.empty())
+			if (romexist)
+			{
+				setOrdersta(curorder, 2);
+			//	char *keepinfo = 
+				USES_CONVERSION;
+				db.KeepOrderSyn(T2A(path.GetBuffer()), "2");
+				path.ReleaseBuffer();
+			}
+			else if (dbexist)
+				db.UpdateOrderIssend("2", curorder);
+
+			if (!user->user_order.empty() || dbexist)
 				Trans.sendCurrentPic(path);
 				//Trans.sendCurrentPic(user->user_order.front().order_info); //从队列里取第一个指令，包括长度和图像数据
 			//int temp = -9999;
@@ -298,12 +354,21 @@ int DataJudgment::recvCurHrt(ClientParam *param,bool fir)
 				s_order = S_HEART_IMAGE_READLY;
 				break;
 			}
-			setOrdersta(curorder,1);
+			if (romexist)
+			{
+				setOrdersta(curorder, 1);
+				USES_CONVERSION;
+				db.KeepOrderSyn(T2A(path.GetBuffer()), "1");
+				path.ReleaseBuffer();
+			}
+			else if (dbexist)
+				db.UpdateOrderIssend("1", curorder);
 		//	user->user_order.erase(user->user_order.begin());//删除Vector第一个元素
 			(*m_client)[user->index] = *user;//不能对client使用front()，应当在user进入client时返回一个编号，通过编号访问
 			/*
 				此处更新指令的状态信息
 			*/
+			
 			s_order = S_HEART_LIVE_FEED;
 			break;
 		}
