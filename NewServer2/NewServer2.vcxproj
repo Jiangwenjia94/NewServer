@@ -160,6 +160,7 @@
     <ClInclude Include="LuojiaOrbit.h" />
     <ClInclude Include="NewServer2.h" />
     <ClInclude Include="Orbit.h" />
+    <ClInclude Include="PortableParam.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SocketThread.h" />
     <ClInclude Include="SocketTrans.h" />
@@ -185,6 +186,7 @@
     <ClCompile Include="LuojiaOrbit.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Orbit.cpp" />
+    <ClCompile Include="PortableParam.cpp" />
     <ClCompile Include="SocketThread.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>

@@ -53,7 +53,7 @@ void SocketThread::StartServerSock(struct ClientParam *pClientSockParam)
 	}
 }
 
-void SocketThread::StartClientOrderSock(struct ClientParam *pClientSockParam)
+void SocketThread::StartClientSendOrderSock(struct ClientParam *pClientSockParam)
 {
 	DataExPortable DP;
 	DP.Trans.Set(pClientSockParam);
@@ -61,7 +61,13 @@ void SocketThread::StartClientOrderSock(struct ClientParam *pClientSockParam)
 	while (1)
 	{
 		int order = 0;
-		order = DP.OrderEx(fir);
+		int key = 0;
+		cout << "ÊäÈë1" << endl;
+		cin >> key;
+		if (key == 1)
+		{
+			order = DP.OrderSend(fir);
+		}
 		if (order >= 0)
 		{
 			fir = false;
@@ -73,7 +79,48 @@ void SocketThread::StartClientOrderSock(struct ClientParam *pClientSockParam)
 	}
 }
 
-void SocketThread::StartClientDataSock(struct ClientParam *pClientSockParam)
+void SocketThread::StartClientRecvOrderSock(struct ClientParam *pClientSockParam)
 {
+	DataExPortable DP;
+	DP.Trans.Set(pClientSockParam);
+	bool fir = true;
+	while (1)
+	{
+		int order = 0;
+		order = DP.OrderRecv(fir);
+		if (order >= 0)
+		{
+			fir = false;
+		}
+		else
+		{
+			break;
+		}
+	}
+}
 
+void SocketThread::StartClientRecvDataSock(struct ClientParam *pClientSockParam)
+{
+	DataExPortable DP;
+	DP.Trans.Set(pClientSockParam);
+	bool fir = true;
+	while (1)
+	{
+		int order = 0;
+		int key = 0;
+		cout << "ÊäÈë1" << endl;
+		cin >> key;
+		if (key == 1)
+		{
+			order = DP.DataRec(fir);
+		}
+		if (order >= 0)
+		{
+			fir = false;
+		}
+		else
+		{
+			break;
+		}
+	}
 }

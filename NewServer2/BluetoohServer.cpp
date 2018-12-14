@@ -37,13 +37,39 @@ DWORD WINAPI RunLANClientOrderMode(LPVOID P)//与第三方传输的Order主线程
 	struct ClientParam *Con = new ClientParam;
 	Con->ClientSocket = clientSock;
 //	Con->clntAddr = (SOCKADDR)clientAddr;//有瑕疵
-	((BluetoohServer*)P)->Socketthread.StartClientOrderSock(Con);
+//	((BluetoohServer*)P)->Socketthread.StartClientSendOrderSock(Con);
+	((BluetoohServer*)P)->Socketthread.StartClientRecvOrderSock(Con);
 	return 0;
 }
 
 DWORD WINAPI BluetoohServer::RunLANClientDataMode(LPVOID P)//与第三方传输的Data主线程
 {
-	return 0;
+	int ulRetCode = SER_SUCCESS;
+	SOCKET clientSock = socket(PF_INET, SOCK_STREAM, 0);
+	//初始化socket信息
+	sockaddr_in clientAddr;
+	memset(&clientAddr, 0, sizeof(SOCKADDR));
+	//clientAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	clientAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	clientAddr.sin_family = PF_INET;
+	clientAddr.sin_port = htons(3075);
+
+	if (SOCKET_ERROR == connect(clientSock, (SOCKADDR*)&clientAddr, sizeof(SOCKADDR)))
+	{
+#ifdef PRINT_DEBUG
+		printf("=CRITICAL= | connect() failed. WSAGetLastError = [%d]\n", WSAGetLastError());
+#endif // PRINT_DEBUG
+
+		((BluetoohServer*)(P))->Logevent.WriteLog("=CRITICAL= | socket() call failed. WSAGetLastError = " + WSAGetLastError());
+		ulRetCode = SER_ERROR;
+		return ulRetCode;
+	}
+	struct ClientParam *Con = new ClientParam;
+	Con->ClientSocket = clientSock;
+	//	Con->clntAddr = (SOCKADDR)clientAddr;//有瑕疵
+	//	((BluetoohServer*)P)->Socketthread.StartClientSendOrderSock(Con);
+	((BluetoohServer*)P)->Socketthread.StartClientRecvDataSock(Con);
+	return ulRetCode;
 }
 
 DWORD WINAPI BluetoohServer::RunLANServerMode(LPVOID P)//LAN主线程
@@ -356,8 +382,8 @@ int BluetoohServer::start(int sw)
 	HANDLE handleClientThread_Order;
 	HANDLE handleClientThread_Data;
 	//RunLANServerMode()作为类成员函数则不需要WaitForSingleObject也会阻塞
-	handleClientThread_Order = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunLANClientOrderMode, (LPVOID)this, 0, &dwThreadID[0]);
-	//	handleClientThread_Data = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunLANClientDataMode(this), (LPVOID)this, 0, &dwThreadID[1]);
+//	handleClientThread_Order = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunLANClientOrderMode, (LPVOID)this, 0, &dwThreadID[0]);
+	handleClientThread_Data = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunLANClientDataMode(this), (LPVOID)this, 0, &dwThreadID[1]);
 	if (sw == LAN)
 		handleServerThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunLANServerMode(this), (LPVOID)this, 0, &dwThreadID[2]);
 	else if (sw == BTH)

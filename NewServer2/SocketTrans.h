@@ -19,7 +19,6 @@ public:
 //	float Send(float order);
 
 	UINT sendCurrentPic(CString path);
-
 	LogEvent Logevent;
 private:
 	ClientParam *m_param;

@@ -13,9 +13,11 @@ public:
 
 	void StartServerSock(ClientParam* pClientSockParam);
 
-	void StartClientOrderSock(ClientParam* pClientSockParam);
+	void StartClientSendOrderSock(ClientParam* pClientSockParam);
+	void StartClientRecvOrderSock(ClientParam* pClientSockParam);
 
-	void StartClientDataSock(ClientParam* pClientSockParam);
+	void StartClientSendDataSock(ClientParam* pClientSockParam);
+	void StartClientRecvDataSock(ClientParam* pClientSockParam);
 
 	vector<USER> client;//存储每一个用户
 	ClientParam Clientparam;

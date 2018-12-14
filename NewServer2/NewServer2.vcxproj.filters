@@ -63,6 +63,9 @@
     <ClInclude Include="Database.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="PortableParam.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -96,6 +99,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Database.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PortableParam.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

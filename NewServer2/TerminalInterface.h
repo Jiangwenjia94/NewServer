@@ -1,4 +1,4 @@
-
+#pragma once
 #include <bitset>   
 
 #define DATA_ERROR -1
@@ -31,7 +31,7 @@ struct Coor
 	Coor(int n)
 	{
 		num = n;
-		xy = new float[n];
+		xy = new float[ 2 * n];
 	}
 };
 
@@ -59,7 +59,7 @@ struct QData			//一个数据的信息 用于接收
 
 };
 //控制指令
-struct DataQuery_0				//3.5.1 本地零级数据列表查询指令,共128个字节
+struct DataQuery_0				//3.5.1 本地零级数据列表查询指令
 {
 	MsgHeader header_0;			//消息头
 	int id;						//模块ID
@@ -135,13 +135,14 @@ struct DataRecv_RT_Response		//3.6.3 实时数据接收响应-1-2-3-5 事后数据响应2 leng
 
 struct TMBlock					//默认为原始数据
 {
-	int frame_header = 0;
-	int *data;
-	//	int	lastdata;				//最后<=8字节数据+可能存在的零填充数据
+	int frame_header = 1024;	//原始数据帧长固定为1024
+	char *data;
+	int	lastdata;				//最后<=8字节数据+可能存在的零填充数据
 	int tm_time;				//TM块时间
 	int tm_state;				//TM块状态
 	int placeholder;				//保留值
 };
+
 
 struct DataRecv_RT_Data		//3.6.6 实时数据接收响应-4  3.6.8事后数据响应1
 {
@@ -158,6 +159,7 @@ struct DataRecv_RT_Data		//3.6.6 实时数据接收响应-4  3.6.8事后数据响应1
 	int placeholder[43];
 	TMBlock *TMB;
 	int end; 
+	char path[100];
 };
 
 

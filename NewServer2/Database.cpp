@@ -255,3 +255,279 @@ bool Database::KeepOrderSyn(char *order_info, char *issend)
 		return true;
 	return false;
 }
+
+///////////////////////////////÷’∂À»Îø‚/////////////////////////////////
+
+bool Database::InsertGeometry(int id, float *coor)
+{
+	//MYSQL_RES *m_res;
+	////////
+	//char *upresql = "insert into testtable (id) values(";
+	//char sql[1024];
+	//memset(sql, 0, sizeof(sql));
+	//sprintf_s(sql, sizeof(sql), "%s%d%s", upresql,id, ")");
+	//char* Msg = "";
+	//if (!InsertData(sql, Msg))
+	//	return 1;
+
+	float co[8] = { 123.11, 12.22, 124.22, 34.33, 125.33, 28.44, 123.11, 12.22 };
+	int num = 4;
+	char SQL[1024];
+	memset(SQL, 0, sizeof(SQL));
+	//	MakePoly(num,987,co,SQL);
+
+	cout << SQL << endl;
+
+	return 0;
+}
+
+//÷’∂À»Îø‚
+
+void Database::MakePoly(int num, float *coor, char *SQL)
+{
+	char cSQL[1024];
+	memset(cSQL, 0, sizeof(cSQL));
+	char cPolygon[1024];
+	memset(cPolygon, 0, sizeof(cPolygon));
+	char *presql = "INSERT INTO testtable (id,coor) VALUES (";
+	char *midsql = "(ST_PolygonFromText(";
+	char *prepoly = "'POLYGON((";
+
+	for (int i = 0; i < num * 2; i++)
+	{
+		if (i == 0)
+		{
+			sprintf_s(cPolygon, "%s%.3f", prepoly, coor[i]);
+		}
+		else if (i == num * 2 - 1)					//Ω·Œ≤
+		{
+			int size = strlen(cPolygon) + 1;
+			char *temp = (char*)malloc(sizeof(char) * size);
+			strcpy_s(temp, size, cPolygon);
+			sprintf_s(cPolygon, "%s%s%.3f%s%.3f%s%.3f%s", temp, " ", coor[i], ",", coor[0], " ", coor[1], "))'");
+			delete temp;
+		}
+		else if (i != 0 && i % 2 == 0)		//ÃÌº”∂∫∫≈
+		{
+			int size = strlen(cPolygon) + 1;
+			char *temp = (char*)malloc(sizeof(char) * size);
+			strcpy_s(temp, size, cPolygon);
+			sprintf_s(cPolygon, "%s%s%.3f", temp, ",", coor[i]);
+			delete temp;
+
+
+		}
+		else
+		{
+			int size = strlen(cPolygon) + 1;
+			char *temp = (char*)malloc(sizeof(char) * size);
+			strcpy_s(temp, size, cPolygon);
+			sprintf_s(cPolygon, "%s%s%.3f", temp, " ", coor[i]);
+			delete temp;
+		}
+	}
+	sprintf_s(cSQL, "%s%s%s", midsql, cPolygon, "))");
+	int allsize = strlen(cSQL) + 1;
+	strcpy_s(SQL, allsize, cSQL);
+}
+
+bool Database::InsertIntoClientQueComd(DataQuery_0 DQ)
+{
+	char polysql[1024];
+	memset(polysql, 0, sizeof(polysql));
+	MakePoly(DQ.coor->num, DQ.coor->xy, polysql);
+	char *opresql = "INSERT INTO client_querycommand (id,data_size,query_term,satellite_name,time_begin1,time_begin2,time_begin_years,time_end1,time_end2,time_end_years,coor_num,coordinate,max_listnum) VALUES (";
+	char sql[1024];
+	int id = 9;
+	memset(sql, 0, sizeof(sql));
+	char *satellite;
+	size_t len = wcslen(DQ.satellite) + 1;
+	size_t converted = 0;
+	satellite = (char*)malloc(len*sizeof(char));
+	wcstombs_s(&converted, satellite, len, DQ.satellite, _TRUNCATE);
+	sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%d%s%s%s%d%s%d%s%d%s%d%s%d%s%d%s%d%s%s%s%d%s", opresql, id, ",", DQ.header_0.length, ",", DQ.requirement, ",'", satellite, "',", DQ.time_begin[0], ",", DQ.time_begin[1], ",", DQ.time_begin_years, ",", DQ.time_end[0], ",", DQ.time_end[1], ",", DQ.time_end_years, ",", DQ.coor->num, ",", polysql, ",", DQ.list_max, ")");
+	delete satellite;
+	cout << sql << endl;
+	char* Msg = "";
+	if (!InsertData(sql, Msg))
+		return false;
+	return true;
+}
+
+bool Database::InsertIntoClientQueResp(DataQuery_0_Response DQR)
+{
+	int id = 99;
+	int messageid = 12345;
+	int *dataid;
+	int listnum = DQR.list_number;
+	dataid = new int[listnum];
+	char polysql[1024];
+	char *presql = "INSERT INTO client_queryresponse (id,message_id,data_size,max_listnum,data_id) VALUES (";
+	char sql[1024];
+	cout << "main: " << endl;
+	for (int i = 0; i < listnum; i++)
+	{
+		dataid[i] = i;
+		id++;
+		memset(sql, 0, sizeof(sql));
+		sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%d%s%d%s%d%s", presql, id, ",", messageid, ",", DQR.header_0.length, ",", DQR.list_number, ",", dataid[i], ")");
+		cout << sql << endl;
+		cout << endl;
+		char* Msg = "";
+		if (!InsertData(sql, Msg))
+		{
+			cout << "insert error!" << endl;
+			return false;
+		}
+	}
+	char *datapresql = "INSERT INTO client_queryresponse_data (id,message_id,satellite_name,time_begin1,time_begin2,time_begin_years,time_end1,time_end2,time_end_years,coor_num,coordinate,data_size,tm_num,tm_size,frame_length,framehead_length,task_num,record_num) VALUES (";
+	char datasql[1024];
+	memset(datasql, 0, sizeof(datasql));
+	cout << "data: " << endl;
+	for (int i = 0; i < listnum; i++)
+	{
+		memset(sql, 0, sizeof(sql));
+		memset(polysql, 0, sizeof(polysql));
+		MakePoly(DQR.qdata[i].coor->num, DQR.qdata[i].coor->xy, polysql);
+		//	dataid[i] = i;
+		char *satellite;
+		size_t len = wcslen(DQR.qdata[i].name) + 1;
+		size_t converted = 0;
+		satellite = (char*)malloc(len*sizeof(char));
+		wcstombs_s(&converted, satellite, len, DQR.qdata[i].name, _TRUNCATE);
+		sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%s%s%d%s%d%s%d%s%d%s%d%s%d%s%d%s%s%s%.3f%s%d%s%d%s%d%s%d%s%d%s%d%s",
+			datapresql, dataid[i], ",", messageid, ",'", satellite, "',", DQR.qdata[i].time_begin[0], ",", DQR.qdata[i].time_begin[1],
+			",", DQR.qdata[i].time_begin_year, ",", DQR.qdata[i].time_end[0], ",", DQR.qdata[i].time_end[1],
+			",", DQR.qdata[i].time_end_year, ",", DQR.qdata[i].coor->num, ",", polysql, ",", DQR.qdata[i].data_size,
+			",", DQR.qdata[i].tm_number, ",", DQR.qdata[i].tm_size, ",", DQR.qdata[i].frame_length, ",", DQR.qdata[i].frame_header_length,
+			",", DQR.qdata[i].task_number, ",", DQR.qdata[i].record, ")");
+		delete satellite;
+		cout << sql << endl;
+		cout << endl;
+		char* Msg = "";
+		if (!InsertData(sql, Msg))
+		{
+			cout << "insert error!" << endl;
+			return false;
+		}
+	}
+	return true;
+}
+
+bool Database::InsertIntoClientRecvComd(DataRecv DR)
+{
+	char polysql[1024];
+	memset(polysql, 0, sizeof(polysql));
+	MakePoly(DR.coor->num, DR.coor->xy, polysql);
+	char *opresql = "INSERT INTO client_datarecvcommand (id,data_size,request_code,recv_term,satellite_name,time_begin1,time_begin2,time_begin_years,time_end1,time_end2,time_end_years,coor_num,coordinate) VALUES (";
+	char sql[1024];
+	int id = 9;
+	memset(sql, 0, sizeof(sql));
+	char *satellite;
+	size_t len = wcslen(DR.satellite) + 1;
+	size_t converted = 0;
+	satellite = (char*)malloc(len*sizeof(char));
+	wcstombs_s(&converted, satellite, len, DR.satellite, _TRUNCATE);
+	sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%d%s%d%s%s%s%d%s%d%s%d%s%d%s%d%s%d%s%d%s%s%s", opresql, id, ",", DR.header_0.length, ",", DR.request_id, ",", DR.requirement, ",'", satellite, "',", DR.time_begin[0], ",", DR.time_begin[1], ",", DR.time_begin_years, ",", DR.time_end[0], ",", DR.time_end[1], ",", DR.time_end_years, ",", DR.coor->num, ",", polysql, ")");
+	delete satellite;
+	cout << sql << endl;
+	char* Msg = "";
+	if (!InsertData(sql, Msg))
+	{
+		cout << "insert error!" << endl;
+		return false;
+	}
+	return true;
+}
+
+bool Database::InsertIntoClientPostData2(DataRecv_RT_Response DRTR)
+{
+	char *opresql = "INSERT INTO client_post_data_2 (id,data_size,satellite_name,ready) VALUES (";
+	char sql[1024];
+	int id = 9;
+	memset(sql, 0, sizeof(sql));
+	char *satellite;
+	size_t len = wcslen(DRTR.satellite) + 1;
+	size_t converted = 0;
+	satellite = (char*)malloc(len*sizeof(char));
+	wcstombs_s(&converted, satellite, len, DRTR.satellite, _TRUNCATE);
+	sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%s%s%d%s", opresql, id, ",", DRTR.header_0.length, ",'", satellite, "',", DRTR.state, ")");
+	delete satellite;
+	cout << sql << endl;
+	char* Msg = "";
+	if (!InsertData(sql, Msg))
+	{
+		cout << "insert error!" << endl;
+		return false;
+	}
+	return true;
+}
+
+bool Database::InsertIntoClientSynData1235(DataRecv_RT_Response DRTR)
+{
+	char *opresql = "INSERT INTO client_syn_data_1235 (id,data_size,satellite_name,ready) VALUES (";
+	char sql[1024];
+	int id = 9;
+	memset(sql, 0, sizeof(sql));
+	char *satellite;
+	size_t len = wcslen(DRTR.satellite) + 1;
+	size_t converted = 0;
+	satellite = (char*)malloc(len*sizeof(char));
+	wcstombs_s(&converted, satellite, len, DRTR.satellite, _TRUNCATE);
+	sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%s%s%d%s", opresql, id, ",", DRTR.header_0.length, ",'", satellite, "',", DRTR.state, ")");
+	delete satellite;
+	cout << sql << endl;
+	char* Msg = "";
+	if (!InsertData(sql, Msg))
+	{
+		cout << "insert error!" << endl;
+		return false;
+	}
+	return true;
+}
+
+bool Database::InsertIntoClientSynData4(DataRecv_RT_Data DRTD)
+{
+	char *opresql = "INSERT INTO client_syn_data_4 (id,data_size,satellite_name,framehead_length,frame_length,time_length,tm_state_length,tm_length,tm_num,tm_path) VALUES (";
+	char sql[1024];
+	int id = 9;
+	memset(sql, 0, sizeof(sql));
+	char *satellite;
+	size_t len = wcslen(DRTD.satellite) + 1;
+	size_t converted = 0;
+	satellite = (char*)malloc(len*sizeof(char));
+	wcstombs_s(&converted, satellite, len, DRTD.satellite, _TRUNCATE);
+	sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%s%s%d%s%d%s%d%s%d%s%d%s%d%s%s%s", opresql, id, ",", DRTD.header_0.length, ",'", satellite, "',", DRTD.frame_header_length, ",", DRTD.frame_lenght, ",", DRTD.timeblock_length, ",", DRTD.tm_stateblock_length, ",", DRTD.tm_length, ",", DRTD.tm_number, ",'", DRTD.path, "')");
+	delete satellite;
+	cout << sql << endl;
+	char* Msg = "";
+	if (!InsertData(sql, Msg))
+	{
+		cout << "insert error!" << endl;
+		return false;
+	}
+	return true;
+}
+
+bool Database::InsertIntoClientPostData1(DataRecv_RT_Data DRTD)
+{
+	char *opresql = "INSERT INTO client_post_data_1 (id,data_size,satellite_name,framehead_length,frame_length,time_length,tm_state_length,tm_length,tm_num,tm_path) VALUES (";
+	char sql[1024];
+	int id = 9;
+	memset(sql, 0, sizeof(sql));
+	char *satellite;
+	size_t len = wcslen(DRTD.satellite) + 1;
+	size_t converted = 0;
+	satellite = (char*)malloc(len*sizeof(char));
+	wcstombs_s(&converted, satellite, len, DRTD.satellite, _TRUNCATE);
+	sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%s%s%d%s%d%s%d%s%d%s%d%s%d%s%s%s", opresql, id, ",", DRTD.header_0.length, ",'", satellite, "',", DRTD.frame_header_length, ",", DRTD.frame_lenght, ",", DRTD.timeblock_length, ",", DRTD.tm_stateblock_length, ",", DRTD.tm_length, ",", DRTD.tm_number, ",'", DRTD.path, "')");
+	delete satellite;
+	cout << sql << endl;
+	char* Msg = "";
+	if (!InsertData(sql, Msg))
+	{
+		cout << "insert error!" << endl;
+		return false;
+	}
+	return true;
+}

@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <mysql.h>
 #include <string>
+#include "TerminalInterface.h"
 using namespace std;
 
 class Database
@@ -25,6 +26,19 @@ public:
 	bool GetUserIsfirst(char *usernum,string &data);
 	bool GetReadyOrder(char *usernum, string *(&data));
 	bool KeepOrderSyn(char *order_info,char *issend);
+
+	///÷’∂À»Îø‚
+	void MakePoly(int num, float *coor, char *SQL);
+	bool InsertGeometry(int id, float *coor);
+	bool InsertIntoClientQueComd(DataQuery_0 DQ);
+	bool InsertIntoClientQueResp(DataQuery_0_Response DQR);
+	bool InsertIntoClientRecvComd(DataRecv DR);
+	bool InsertIntoClientSynData1235(DataRecv_RT_Response DRTR);
+	bool InsertIntoClientSynData4(DataRecv_RT_Data DRTD);
+	bool InsertIntoClientPostData1(DataRecv_RT_Data DRTD);
+	bool InsertIntoClientPostData2(DataRecv_RT_Response DRTR);
+
+	///÷’∂À»Îø‚
 private:
 	MYSQL mysql;
 };

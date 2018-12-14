@@ -75,6 +75,7 @@ char* DataJudgment::infoStateInquiry(int num)
 	int next_num = 0;
 	char now_info[20];
 	char next_info[20];
+	
 	if (user->user_order.empty())
 	{
 		char *info_null = "the queue is NULL";
