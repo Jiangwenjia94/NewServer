@@ -382,7 +382,7 @@ int BluetoohServer::start(int sw)
 	HANDLE handleClientThread_Order;
 	HANDLE handleClientThread_Data;
 	//RunLANServerMode()作为类成员函数则不需要WaitForSingleObject也会阻塞
-//	handleClientThread_Order = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunLANClientOrderMode, (LPVOID)this, 0, &dwThreadID[0]);
+	handleClientThread_Order = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunLANClientOrderMode, (LPVOID)this, 0, &dwThreadID[0]);
 	handleClientThread_Data = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunLANClientDataMode(this), (LPVOID)this, 0, &dwThreadID[1]);
 	if (sw == LAN)
 		handleServerThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunLANServerMode(this), (LPVOID)this, 0, &dwThreadID[2]);

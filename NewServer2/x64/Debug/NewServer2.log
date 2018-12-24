@@ -1,19 +1,57 @@
-﻿生成启动时间为 2018/12/14 星期五 10:56:06。
+﻿生成启动时间为 2018/12/22 星期六 21:50:17。
      1>项目“H:\Visual Studio 2013\Projects\NewServer2\NewServer2\NewServer2.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
-         E:\software\VisualStudio2013\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /sdl- /Od /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt BluetoohServer.cpp
-         BluetoohServer.cpp
-         _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
-     1>BluetoohServer.cpp(7): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
-     1>BluetoohServer.cpp(23): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850) : 参见“inet_addr”的声明
-     1>BluetoohServer.cpp(53): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850) : 参见“inet_addr”的声明
-     1>BluetoohServer.cpp(101): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850) : 参见“inet_addr”的声明
-     1>BluetoohServer.cpp(80): warning C4101: “clntAddr”: 未引用的局部变量
-     1>BluetoohServer.cpp(382): warning C4101: “handleClientThread_Order”: 未引用的局部变量
-     1>h:\visual studio 2013\projects\newserver2\newserver2\bluetoohserver.cpp(396): warning C4715: “BluetoohServer::start”: 不是所有的控件路径都返回值
+         E:\software\VisualStudio2013\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /sdl- /Od /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt DataExPortable.cpp Database.cpp
+         Database.cpp
+     1>Database.cpp(58): warning C4244: “=”: 从“my_ulonglong”转换到“int”，可能丢失数据
+     1>Database.cpp(90): warning C4244: “=”: 从“my_ulonglong”转换到“int”，可能丢失数据
+     1>Database.cpp(66): warning C4101: “m_row”: 未引用的局部变量
+     1>Database.cpp(214): warning C4996: 'itoa': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _itoa. See online help for details.
+                 E:\software\VisualStudio2013\VC\include\stdlib.h(937) : 参见“itoa”的声明
+     1>Database.cpp(273): warning C4305: “初始化”: 从“double”到“float”截断
+     1>Database.cpp(304): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>Database.cpp(312): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>Database.cpp(322): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>Database.cpp(330): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+         DataExPortable.cpp
+     1>DataExPortable.cpp(52): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 E:\software\VisualStudio2013\VC\include\wchar.h(1042) : 参见“wcscpy”的声明
+     1>DataExPortable.cpp(81): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 E:\software\VisualStudio2013\VC\include\wchar.h(1042) : 参见“wcscpy”的声明
+     1>DataExPortable.cpp(417): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(418): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(419): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(420): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(421): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(422): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(423): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(424): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(425): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(426): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(676): warning C4101: “tm_length”: 未引用的局部变量
+     1>DataExPortable.cpp(799): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 E:\software\VisualStudio2013\VC\include\stdio.h(356) : 参见“sprintf”的声明
+     1>DataExPortable.cpp(819): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 E:\software\VisualStudio2013\VC\include\stdio.h(356) : 参见“sprintf”的声明
+     1>DataExPortable.cpp(826): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 E:\software\VisualStudio2013\VC\include\stdio.h(356) : 参见“sprintf”的声明
+     1>DataExPortable.cpp(853): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 E:\software\VisualStudio2013\VC\include\stdio.h(356) : 参见“sprintf”的声明
+     1>DataExPortable.cpp(860): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 E:\software\VisualStudio2013\VC\include\stdio.h(356) : 参见“sprintf”的声明
+     1>DataExPortable.cpp(908): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(909): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(910): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(911): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(912): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(913): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(914): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(915): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(916): warning C4305: “=”: 从“double”到“float”截断
+     1>DataExPortable.cpp(917): warning C4305: “=”: 从“double”到“float”截断
+         正在生成代码...
+     1>h:\visual studio 2013\projects\newserver2\newserver2\dataexportable.cpp(212): warning C4700: 使用了未初始化的局部变量“recv_length”
+     1>h:\visual studio 2013\projects\newserver2\newserver2\dataexportable.cpp(931): warning C4715: “DataExPortable::OrderSend”: 不是所有的控件路径都返回值
        Link:
          E:\software\VisualStudio2013\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"H:\Visual Studio 2013\Projects\NewServer2\x64\Debug\NewServer2.exe" /INCREMENTAL /NOLOGO libmysql.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:E:\software\VisualStudio2013\VC\Include\Manifest\dpiaware.manifest /DEBUG /PDB:"H:\Visual Studio 2013\Projects\NewServer2\x64\Debug\NewServer2.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"H:\Visual Studio 2013\Projects\NewServer2\x64\Debug\NewServer2.lib" /MACHINE:X64 x64\Debug\NewServer2.res
          x64\Debug\BluetoohServer.obj
@@ -33,4 +71,4 @@
 
 生成成功。
 
-已用时间 00:00:03.29
+已用时间 00:00:07.03

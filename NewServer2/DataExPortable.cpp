@@ -27,6 +27,16 @@ void PrintDQ(DataQuery_0 DQ)
 	std::cout << DQ.list_max << std::endl;
 	std::cout << DQ.end << std::endl;
 }
+void SetTime(int &ti, int Increment)			//时间，月份的增加量
+{
+	SYSTEMTIME st = { 0 };
+	GetLocalTime(&st);
+	ti = (st.wMonth + Increment) * 100000000;
+	ti += st.wDay * 1000000;
+	ti += st.wHour * 10000;
+	ti += st.wMinute * 100;
+	ti += st.wSecond;
+}
 
 
 DataExPortable::DataExPortable()
@@ -36,6 +46,11 @@ DataExPortable::DataExPortable()
 
 DataExPortable::~DataExPortable()
 {
+}
+
+bool DataExPortable::ConnectDB()
+{
+	return DB.Connect();
 }
 
 void DataExPortable::SetZeroQuery(DataQuery_0 &DQ, MsgHeader mh, int requirement, wchar_t name[20], int time[6], int num, float *coordinate, int maxlistnum, int id, int request_id)
@@ -84,29 +99,35 @@ void DataExPortable::SetDataRecvOrder(DataRecv &DaR, MsgHeader mh, int port, int
 //	DaR.coor->xy = new float[num];
 	for (int i = 0; i < num * 2; i++)
 	{
-		DaR.coor->xy[i] = coordinate[i];
+ 		DaR.coor->xy[i] = coordinate[i];
 	}
 
 	DaR.end = END;
 }
 
-bool DataExPortable::SendMsgHed(MsgHeader mh)
+int DataExPortable::SendMsgHed(MsgHeader mh)
 {
 	bool result = true;
+	int send_length = 0;
 	int sen = 0;
 
 	sen = Trans.Send(mh.begin);
 	if (sen < 0)
 		return false;
+	send_length += sen;
+
 	sen = Trans.Send(mh.length);
 	if (sen < 0)
 		return false;
+	send_length += sen;
 
 	sen = Trans.Send(mh.id);
 	if (sen < 0)
 		return false;
+	send_length += sen;
 
-	return result;
+	return send_length;
+
 }
 bool DataExPortable::SendZeroQuery(DataQuery_0 DQ)
 {
@@ -234,9 +255,9 @@ bool DataExPortable::RecvZeroResponse(MsgHeader mh, DataQuery_0_Response &DR)
 	return result;
 }
 
-bool DataExPortable::RecvMsgHed(MsgHeader &mh)
+int DataExPortable::RecvMsgHed(MsgHeader &mh)
 {
-	bool result = true;
+	int result = 0;
 	int rec = 0;
 	int temp = -1;
 
@@ -244,19 +265,22 @@ bool DataExPortable::RecvMsgHed(MsgHeader &mh)
 	if (rec > 0)
 		mh.begin = temp;
 	else
-		return false;
+		return -1;
+	result += rec;
 
 	rec = Trans.Recv(temp);
 	if (rec > 0)
 		mh.length = temp;
 	else
-		return false;
+		return -1;
+	result += rec;
 
 	rec = Trans.Recv(temp);
 	if (rec > 0)
 		mh.id = temp;
 	else
-		return false;
+		return -1;
+	result += rec;
 
 	return result;
 }
@@ -384,7 +408,6 @@ int DataExPortable::DataRec(bool isfir)
 		*/
 	}
 	//首先接收消息头
-	int num = 1000;
 
 	MsgHeader msg;
 	MsgHeader rec_msg;
@@ -393,12 +416,14 @@ int DataExPortable::DataRec(bool isfir)
 
 	int ttime[6] = { 0 };
 	ttime[0] = 1;
-	ttime[1] = 2;
-	ttime[2] = 1990;
-	ttime[3] = 98;
-	ttime[4] = 99;
+	ttime[1] = 0;
+	ttime[2] = 2018;
+	ttime[3] = 10;
+	ttime[4] = 0;
 	ttime[5] = 2018;
-	float coordinate[10] = { 0.000 };
+	int num = 5;
+//	float coordinate[10] = { 0.000 };
+	float *coordinate = new float[num * 2];
 	coordinate[0] = 1.111;
 	coordinate[1] = 1.222;
 	coordinate[2] = 2.333;
@@ -409,23 +434,33 @@ int DataExPortable::DataRec(bool isfir)
 	coordinate[7] = 4.888;
 	coordinate[8] = 5.999;
 	coordinate[9] = 5.001;
-	SetDataRecvOrder(DR, msg, 1, 2, 3, L"abcd", ttime, 5, coordinate);
+	msg.length = 248 + (2 * num + 1) * 4;
+//	msg.length = 0;
+	SetDataRecvOrder(DR, msg, 1, 4, 5, L"abcd", ttime, 5, coordinate);
 
 	bool isfin = false;
 	int senlength = 0;
-	int orderSize = 0;
 	int headlength = 0;
 	int recvlength = 0;
+	int tableid = 0;
 	while (1)
 	{
-		int c = 0;
-		cin >> c;
+	//	int c = 0;
+	//	cin >> c;
 		headlength = SendMsgHed(msg);
-		orderSize = msg.length;
 		senlength = SendDataRecvOrder(msg, DR);		//发送数据接收指令
+		if (senlength + headlength == msg.length)
+		{
+			SetTime(tableid, 0);
+			if (!DB.InsertIntoClientRecvComd(DR,tableid))
+				cout << "insert ClientRecvComd error!" << endl;
+		}
+		else
+		{
+			return 0;
+		}
 
-		int rec = RecvMsgHed(rec_msg);
-		if (rec > 0 && rec_msg.length != 24)		//数据可以发送则开始接收
+		if (1/*rec > 0 && rec_msg.length != 24*/)		//数据可以发送则开始接收
 		{
 			if (DR.request_id == 3)					//事后数据接收
 			{
@@ -436,17 +471,27 @@ int DataExPortable::DataRec(bool isfir)
 				DataRecv_RT_Response ADRTR;
 				while (1)
 				{
-					headrec = RecvMsgHed(AHead);	//直到接收到数据接收响应5的消息头
-					if (AHead.length == 60)
+					headrec = RecvMsgHed(AHead);	//直到接收到数据接收响应2的消息头
+					if (AHead.length == 80)
 						break;
 					if (headrec <= 0)
 						break;
-					if (!RecvRTData(AHead, ADRTD[count]))
+			//		sprintf_s(ADRTD[count].path, sizeof(ADRTD[count].path),"%d",count);
+					SetTime(tableid, 2);
+					ADRTD[count].path = tableid;
+					int ADRTR_length1 = RecvRTData(AHead, ADRTD[count]);
+					if (ADRTR_length1 + headrec != AHead.length)
 						break;
-					count++;
+					if (DB.InsertIntoClientPostData1(ADRTD[count]))
+						cout << "insert ClientPostData1 error!" << endl;
+					count++;  
 				}
-				if (!RecvRTResponse(AHead, ADRTR))	//接收实时数据接收响应-5
+				int ADRTR_length2 = RecvRTResponse(AHead, ADRTR);
+				if (ADRTR_length2 + headrec != AHead.length)	//接收事后数据接收响应-2
 					break;
+				SetTime(tableid, 3);
+				if(DB.InsertIntoClientPostData2(ADRTR,tableid))
+					cout << "insert ClientPostData2 error!" << endl;
 			}
 			else if (DR.request_id == 4)			//实时数据接收
 			{
@@ -460,23 +505,37 @@ int DataExPortable::DataRec(bool isfir)
 					headrec = RecvMsgHed(DRRTHead[i]);
 					if (headrec <= 0)
 						break;
-					if (!RecvRTResponse(DRRTHead[i], DRTR[i]))
+					int DRTR_length123 = RecvRTResponse(DRRTHead[i], DRTR[i]);
+					if (DRTR_length123 + headrec != DRRTHead[i].length)
 						break;
+					SetTime(tableid, i + 4);
+					if (!DB.InsertIntoClientSynData1235(DRTR[i], tableid + i))
+						cout << "insert ClientSynData1235 error!" << endl;
+
 				}									//实时数据接收响应-1-2-3接收完成
 				int count = 0;
 				while (1)		
 				{
 					headrec = RecvMsgHed(Data4Head);	//直到接收到实时数据接收响应5的消息头
-					if (Data4Head.length == 60)			//=60则是响应5的消息头
+					if (Data4Head.length == 80)			//=80则是响应5的消息头
 						break;
 					if (headrec <= 0)
 						break;
-					if (!RecvRTData(Data4Head, DRTD[count]))
+					SetTime(tableid, 7);
+					DRTD[count].path = tableid;
+					int DRTR_length4 = RecvRTData(Data4Head, DRTD[count]);
+					if (DRTR_length4 + headrec != Data4Head.length)
 						break;
+					if (!DB.InsertIntoClientSynData4(DRTD[count]))
+						cout << "insert ClientSynData4 error!" << endl;
 					count++;
 				}
-				if (!RecvRTResponse(Data4Head, DRTR[3]))	//接收实时数据接收响应-5
+				int DRTR_length5 = RecvRTResponse(Data4Head, DRTR[3]);
+				if (DRTR_length5 + headrec != Data4Head.length)	//接收实时数据接收响应-5
 					break;
+				SetTime(tableid, 8);
+				if (!DB.InsertIntoClientSynData1235(DRTR[3], tableid))
+					cout << "insert ClientSynData1235 error!" << endl;
 			}
 		}
 		else										//接收失败响应
@@ -491,7 +550,7 @@ int DataExPortable::DataRec(bool isfir)
 	return rec;
 }
 
-bool DataExPortable::SendDataRecvOrder(MsgHeader mh, DataRecv DaR)
+int DataExPortable::SendDataRecvOrder(MsgHeader mh, DataRecv DaR)
 {
 	bool result = true;
 	int sen = 0;
@@ -546,7 +605,7 @@ bool DataExPortable::SendDataRecvOrder(MsgHeader mh, DataRecv DaR)
 
 	for (int i = 0; i < DaR.coor->num * 2; i++)
 	{
-		sen = Trans.Send(DaR.coor->xy[i]);
+		sen = Trans.Send((char*)&DaR.coor->xy[i],4);
 		if (sen <= 0)
 			return false;
 		send_length += sen;
@@ -562,10 +621,10 @@ bool DataExPortable::SendDataRecvOrder(MsgHeader mh, DataRecv DaR)
 		return false;
 	send_length += sen;
 
-	if ((send_length + 12) != mh.length)	//此次发送的+消息头+消息尾
-		return false;
+//	if ((send_length + 12) != mh.length)	//此次发送的+消息头+消息尾
+//		return false;
 
-	return true;
+	return send_length;
 }
 
 bool DataExPortable::RecvFailOrder(MsgHeader mh, DataRecvFaile_Response &DataFailResp)
@@ -589,7 +648,7 @@ bool DataExPortable::RecvFailOrder(MsgHeader mh, DataRecvFaile_Response &DataFai
 	return true;
 }
 
-bool DataExPortable::RecvRTResponse(MsgHeader mh, DataRecv_RT_Response &RTR)
+int DataExPortable::RecvRTResponse(MsgHeader mh, DataRecv_RT_Response &RTR)
 {
 	int rec = 0;
 	int recv_length = 0;
@@ -598,17 +657,17 @@ bool DataExPortable::RecvRTResponse(MsgHeader mh, DataRecv_RT_Response &RTR)
 	
 	rec = Trans.Recv(RTR.id);
 	if (rec <= 0)
-		return false;
+		return -1;
 	recv_length += rec;
 
 	rec = Trans.Recv((char*)RTR.satellite, sizeof(RTR.satellite));
 	if (rec <= 0)
-		return false;
+		return -1;
 	recv_length += rec;
 
 	rec = Trans.Recv(RTR.state);
 	if (rec <= 0)
-		return false;
+		return -1;
 	recv_length += rec;
 
 	rec = Trans.Recv((char*)RTR.placeholder, sizeof(RTR.placeholder));
@@ -618,71 +677,71 @@ bool DataExPortable::RecvRTResponse(MsgHeader mh, DataRecv_RT_Response &RTR)
 
 	rec = Trans.Recv(RTR.end);
 	if (rec <= 0 || RTR.end != END)
-		return false;
+		return -1;
 	recv_length += rec;
 
 	if ((recv_length + 12) != mh.length)
-		return false;
+		return -1;
 
-	return true;
+	return recv_length;
 }
 
-bool DataExPortable::RecvRTData(MsgHeader mh, DataRecv_RT_Data &RTD)
+int DataExPortable::RecvRTData(MsgHeader mh, DataRecv_RT_Data &RTD)
 {
 	int tm_length;
 	int rec = 0;
-	int recv_length;
+	int recv_length = 0;
 
 	RTD.header_0 = mh;
 
 	rec = Trans.Recv(RTD.id);
 	if (rec <= 0 )
-		return false;
+		return -1;
 	recv_length += rec;
 
 	rec = Trans.Recv((char*)RTD.satellite,sizeof(RTD.satellite));
 	if (rec <= 0)
-		return false;
+		return -1;
 	recv_length += rec;
 
 	rec = Trans.Recv(RTD.frame_header_length);
 	if (rec <= 0)
-		return false;
+		return -1;
 	recv_length += rec;
 
 	rec = Trans.Recv(RTD.frame_lenght);
 	if (rec <= 0)
-		return false;
+		return -1;
 	recv_length += rec;
 
 	rec = Trans.Recv(RTD.timeblock_length);
 	if (rec <= 0)
-		return false;
+		return -1;
 	recv_length += rec;
 
 	rec = Trans.Recv(RTD.tm_stateblock_length);
 	if (rec <= 0)
-		return false;
+		return -1;
 	recv_length += rec;
 
 	rec = Trans.Recv(RTD.tm_length);
 	if (rec <= 0)
-		return false;
+		return -1;
 	recv_length += rec;
 
 	rec = Trans.Recv(RTD.tm_number);
 	if (rec <= 0)
-		return false;
+		return -1;
 	recv_length += rec;
 
 	rec = Trans.Recv(RTD.tm_header_length);
 	if (rec <= 0)
-		return false;
+		return -1;
 	recv_length += rec;
 
 	rec = Trans.Recv((char*)RTD.placeholder,sizeof(RTD.placeholder));
 	if (rec <= 0)
-		return false;
+		return -1;
 	recv_length += rec;
 
 	bool datatype = 1;
@@ -692,37 +751,36 @@ bool DataExPortable::RecvRTData(MsgHeader mh, DataRecv_RT_Data &RTD)
 
 	rec = Trans.Recv(RTD.end);
 	if (rec <= 0)
-		return false;
+		return -1;
 	recv_length += rec;
 
 	if ((recv_length + 12) != mh.length)
-		return false;
+		return -1;
+
+	return recv_length;
 }
 
 int DataExPortable::RecvTMData(int datasize, DataRecv_RT_Data &RTD, bool datatype)
 {
 	int recv_length = 0;
 	int rec = 0;
-	int tmsize = RTD.tm_length / RTD.tm_number;
-	int lasttmsize = RTD.tm_length - RTD.tm_number * tmsize;
+	int tmsize = 0;
 	
 	int tm_datasize = 0;
-	int tm_lastdatasize = 0;
 
 	if (datatype == 0)			//同步数据
 	{
-		tm_datasize = tmsize - 6 * 4;		//每个tm块中数据的大小
-		tm_lastdatasize = lasttmsize - 6 * 4;
+		tm_datasize = RTD.tm_length * 8;		//每个tm块中数据的大小
 	}
 	else if (datatype == 1)		//原始数据
 	{
-		tm_datasize = tmsize - 5 * 4;		
-		tm_lastdatasize = lasttmsize - 5 * 4;
+		tm_datasize = 1024;
 	}
 
 	RTD.TMB = new TMBlock[RTD.tm_number];
-	char temp[1010] = { 0 };
-	CString path = L"123";
+	char temp[1024] = { 0 };
+	CString path;
+	path.Format(_T("%d"), RTD.path);
 	if (!PathIsDirectory(path))
 	{
 		CreateDirectory(path, NULL);
@@ -733,7 +791,7 @@ int DataExPortable::RecvTMData(int datasize, DataRecv_RT_Data &RTD, bool datatyp
 		cout << "fail" << endl;
 	}
 	CString num;
-	char buf1[100], buf2[100], buf3[100];
+	char buf1[1024], buf2[1024], buf3[1024];
 	for (int i = 0; i < RTD.tm_number; i++)
 	{
 		memset(buf1,0,sizeof(buf1));
@@ -749,10 +807,11 @@ int DataExPortable::RecvTMData(int datasize, DataRecv_RT_Data &RTD, bool datatyp
 		bool isfin = false;
 		if (datatype == 0)	//同步数据
 		{
-			rec = Trans.Recv(RTD.TMB[i].frame_header);
+			RTD.TMB[i].frame_data = new char[RTD.frame_header_length];
+			rec = Trans.Recv((char*)RTD.TMB[i].frame_data, RTD.frame_header_length);
 			if (rec <= 0)
 				return -1;
-			sprintf(buf1, "%d", RTD.TMB[i].frame_header);
+			sprintf(buf1, "%s", RTD.TMB[i].frame_data);
 			file.Write(buf1, sizeof(buf1));
 			recv_length += rec;
 
@@ -760,7 +819,7 @@ int DataExPortable::RecvTMData(int datasize, DataRecv_RT_Data &RTD, bool datatyp
 			int temp_rec = 0;
 			while (temp_rec < tm_datasize)
 			{
-				rec = Trans.Recv((char*)temp,1010);
+				rec = Trans.Recv((char*)temp,1024);
 				if (rec <= 0)
 					return -1;
 				memcpy(RTD.TMB[i].data + temp_rec,temp,strlen(temp));
@@ -769,10 +828,10 @@ int DataExPortable::RecvTMData(int datasize, DataRecv_RT_Data &RTD, bool datatyp
 			}
 			recv_length += temp_rec;
 
-			rec = Trans.Recv(RTD.TMB[i].tm_time);
+			rec = Trans.Recv((char*)RTD.TMB[i].tm_time, 8);
 			if (rec <= 0)
 				return -1;
-			sprintf(buf2, "%d", RTD.TMB[i].tm_time);
+			sprintf(buf2, "%d%d", RTD.TMB[i].tm_time[0], RTD.TMB[i].tm_time[1]);
 			file.Write(buf2, sizeof(buf2));
 			recv_length += rec;
 
@@ -794,7 +853,7 @@ int DataExPortable::RecvTMData(int datasize, DataRecv_RT_Data &RTD, bool datatyp
 			int temp_rec = 0;
 			while (temp_rec < tm_datasize)
 			{
-				rec = Trans.Recv((char*)temp, 1010);
+				rec = Trans.Recv((char*)temp, 1024);
 				if (rec <= 0)
 					return -1;
 				memcpy(RTD.TMB[i].data + temp_rec, temp, strlen(temp));
@@ -803,10 +862,10 @@ int DataExPortable::RecvTMData(int datasize, DataRecv_RT_Data &RTD, bool datatyp
 			}
 			recv_length += temp_rec;
 
-			rec = Trans.Recv(RTD.TMB[i].tm_time);
+			rec = Trans.Recv((char*)RTD.TMB[i].tm_time, 8);
 			if (rec <= 0)
 				return -1;
-			sprintf(buf2, "%d", RTD.TMB[i].tm_time);
+			sprintf(buf2, "%d%d", RTD.TMB[i].tm_time[0], RTD.TMB[i].tm_time[1]);
 			file.Write(buf2, sizeof(buf2));
 			recv_length += rec;
 
@@ -821,8 +880,12 @@ int DataExPortable::RecvTMData(int datasize, DataRecv_RT_Data &RTD, bool datatyp
 			if (rec <= 0)
 				return -1;
 			recv_length += rec;
+
+			cout << "**recv_length:" << RTD.path<<" : "<<recv_length << endl;
 		}
+		file.Close();
 	}
+
 
 	return recv_length                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ;
 }

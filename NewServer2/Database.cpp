@@ -414,14 +414,13 @@ bool Database::InsertIntoClientQueResp(DataQuery_0_Response DQR)
 	return true;
 }
 
-bool Database::InsertIntoClientRecvComd(DataRecv DR)
+bool Database::InsertIntoClientRecvComd(DataRecv DR,int id)
 {
 	char polysql[1024];
 	memset(polysql, 0, sizeof(polysql));
 	MakePoly(DR.coor->num, DR.coor->xy, polysql);
 	char *opresql = "INSERT INTO client_datarecvcommand (id,data_size,request_code,recv_term,satellite_name,time_begin1,time_begin2,time_begin_years,time_end1,time_end2,time_end_years,coor_num,coordinate) VALUES (";
 	char sql[1024];
-	int id = 9;
 	memset(sql, 0, sizeof(sql));
 	char *satellite;
 	size_t len = wcslen(DR.satellite) + 1;
@@ -440,11 +439,10 @@ bool Database::InsertIntoClientRecvComd(DataRecv DR)
 	return true;
 }
 
-bool Database::InsertIntoClientPostData2(DataRecv_RT_Response DRTR)
+bool Database::InsertIntoClientPostData2(DataRecv_RT_Response DRTR,int id)
 {
 	char *opresql = "INSERT INTO client_post_data_2 (id,data_size,satellite_name,ready) VALUES (";
 	char sql[1024];
-	int id = 9;
 	memset(sql, 0, sizeof(sql));
 	char *satellite;
 	size_t len = wcslen(DRTR.satellite) + 1;
@@ -463,11 +461,10 @@ bool Database::InsertIntoClientPostData2(DataRecv_RT_Response DRTR)
 	return true;
 }
 
-bool Database::InsertIntoClientSynData1235(DataRecv_RT_Response DRTR)
+bool Database::InsertIntoClientSynData1235(DataRecv_RT_Response DRTR,int id)
 {
 	char *opresql = "INSERT INTO client_syn_data_1235 (id,data_size,satellite_name,ready) VALUES (";
 	char sql[1024];
-	int id = 9;
 	memset(sql, 0, sizeof(sql));
 	char *satellite;
 	size_t len = wcslen(DRTR.satellite) + 1;
@@ -483,21 +480,21 @@ bool Database::InsertIntoClientSynData1235(DataRecv_RT_Response DRTR)
 		cout << "insert error!" << endl;
 		return false;
 	}
-	return true;
+                                       	return true;
 }
 
 bool Database::InsertIntoClientSynData4(DataRecv_RT_Data DRTD)
 {
 	char *opresql = "INSERT INTO client_syn_data_4 (id,data_size,satellite_name,framehead_length,frame_length,time_length,tm_state_length,tm_length,tm_num,tm_path) VALUES (";
 	char sql[1024];
-	int id = 9;
 	memset(sql, 0, sizeof(sql));
 	char *satellite;
 	size_t len = wcslen(DRTD.satellite) + 1;
 	size_t converted = 0;
+	int id = DRTD.path;
 	satellite = (char*)malloc(len*sizeof(char));
 	wcstombs_s(&converted, satellite, len, DRTD.satellite, _TRUNCATE);
-	sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%s%s%d%s%d%s%d%s%d%s%d%s%d%s%s%s", opresql, id, ",", DRTD.header_0.length, ",'", satellite, "',", DRTD.frame_header_length, ",", DRTD.frame_lenght, ",", DRTD.timeblock_length, ",", DRTD.tm_stateblock_length, ",", DRTD.tm_length, ",", DRTD.tm_number, ",'", DRTD.path, "')");
+	sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%s%s%d%s%d%s%d%s%d%s%d%s%d%s%d%s", opresql, id, ",", DRTD.header_0.length, ",'", satellite, "',", DRTD.frame_header_length, ",", DRTD.frame_lenght, ",", DRTD.timeblock_length, ",", DRTD.tm_stateblock_length, ",", DRTD.tm_length, ",", DRTD.tm_number, ",'", DRTD.path, "')");
 	delete satellite;
 	cout << sql << endl;
 	char* Msg = "";
@@ -513,14 +510,14 @@ bool Database::InsertIntoClientPostData1(DataRecv_RT_Data DRTD)
 {
 	char *opresql = "INSERT INTO client_post_data_1 (id,data_size,satellite_name,framehead_length,frame_length,time_length,tm_state_length,tm_length,tm_num,tm_path) VALUES (";
 	char sql[1024];
-	int id = 9;
 	memset(sql, 0, sizeof(sql));
 	char *satellite;
 	size_t len = wcslen(DRTD.satellite) + 1;
 	size_t converted = 0;
+	int id = DRTD.path;
 	satellite = (char*)malloc(len*sizeof(char));
 	wcstombs_s(&converted, satellite, len, DRTD.satellite, _TRUNCATE);
-	sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%s%s%d%s%d%s%d%s%d%s%d%s%d%s%s%s", opresql, id, ",", DRTD.header_0.length, ",'", satellite, "',", DRTD.frame_header_length, ",", DRTD.frame_lenght, ",", DRTD.timeblock_length, ",", DRTD.tm_stateblock_length, ",", DRTD.tm_length, ",", DRTD.tm_number, ",'", DRTD.path, "')");
+	sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%s%s%d%s%d%s%d%s%d%s%d%s%d%s%d%s", opresql, id, ",", DRTD.header_0.length, ",'", satellite, "',", DRTD.frame_header_length, ",", DRTD.frame_lenght, ",", DRTD.timeblock_length, ",", DRTD.tm_stateblock_length, ",", DRTD.tm_length, ",", DRTD.tm_number, ",'", DRTD.path, "')");
 	delete satellite;
 	cout << sql << endl;
 	char* Msg = "";

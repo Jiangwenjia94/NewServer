@@ -31,7 +31,7 @@ struct Coor
 	Coor(int n)
 	{
 		num = n;
-		xy = new float[ 2 * n];
+		xy = new float[2 * n];
 	}
 };
 
@@ -77,7 +77,7 @@ struct DataQuery_0				//3.5.1 本地零级数据列表查询指令
 
 	DataQuery_0()
 	{
-		memset(placeholder,0,sizeof(placeholder));
+		memset(placeholder, 0, sizeof(placeholder));
 	}
 };
 
@@ -135,10 +135,10 @@ struct DataRecv_RT_Response		//3.6.3 实时数据接收响应-1-2-3-5 事后数据响应2 leng
 
 struct TMBlock					//默认为原始数据
 {
-	int frame_header = 1024;	//原始数据帧长固定为1024
+	char *frame_data;			//同步数据才会使用到
 	char *data;
 	int	lastdata;				//最后<=8字节数据+可能存在的零填充数据
-	int tm_time;				//TM块时间
+	int tm_time[2];				//TM块时间
 	int tm_state;				//TM块状态
 	int placeholder;				//保留值
 };
@@ -158,8 +158,8 @@ struct DataRecv_RT_Data		//3.6.6 实时数据接收响应-4  3.6.8事后数据响应1
 	int tm_header_length = 0;	//TM文件头长度(不知道为什么定义为0)
 	int placeholder[43];
 	TMBlock *TMB;
-	int end; 
-	char path[100];
+	int end;
+	int path;
 };
 
 

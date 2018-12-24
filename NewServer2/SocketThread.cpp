@@ -103,6 +103,7 @@ void SocketThread::StartClientRecvDataSock(struct ClientParam *pClientSockParam)
 {
 	DataExPortable DP;
 	DP.Trans.Set(pClientSockParam);
+	DP.ConnectDB();
 	bool fir = true;
 	while (1)
 	{
