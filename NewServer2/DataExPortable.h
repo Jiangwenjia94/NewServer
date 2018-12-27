@@ -32,8 +32,8 @@ public:
 	int SendDataRecvOrder(MsgHeader mh, DataRecv DaR);
 	bool RecvFailOrder(MsgHeader mh, DataRecvFaile_Response &DataFailResp);
 	int RecvRTResponse(MsgHeader mh, DataRecv_RT_Response &RTR);	//响应1235结构相同，调用四次（不同RT）
-	int RecvRTData(MsgHeader mh, DataRecv_RT_Data &RTD);
-	int	 RecvTMData(int datasize, DataRecv_RT_Data &RTD, bool datatype);
+	int RecvRTData(MsgHeader mh, DataRecv_RT_Data &RTD,char *prepath);
+	int	 RecvTMData(int datasize, DataRecv_RT_Data &RTD, bool datatype, char *prepath);
 	bool RecvPFData();
 	//数据通道
 

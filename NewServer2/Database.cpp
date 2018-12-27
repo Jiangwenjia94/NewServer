@@ -414,7 +414,7 @@ bool Database::InsertIntoClientQueResp(DataQuery_0_Response DQR)
 	return true;
 }
 
-bool Database::InsertIntoClientRecvComd(DataRecv DR,int id)
+bool Database::InsertIntoClientRecvComd(DataRecv DR)
 {
 	char polysql[1024];
 	memset(polysql, 0, sizeof(polysql));
@@ -427,7 +427,7 @@ bool Database::InsertIntoClientRecvComd(DataRecv DR,int id)
 	size_t converted = 0;
 	satellite = (char*)malloc(len*sizeof(char));
 	wcstombs_s(&converted, satellite, len, DR.satellite, _TRUNCATE);
-	sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%d%s%d%s%s%s%d%s%d%s%d%s%d%s%d%s%d%s%d%s%s%s", opresql, id, ",", DR.header_0.length, ",", DR.request_id, ",", DR.requirement, ",'", satellite, "',", DR.time_begin[0], ",", DR.time_begin[1], ",", DR.time_begin_years, ",", DR.time_end[0], ",", DR.time_end[1], ",", DR.time_end_years, ",", DR.coor->num, ",", polysql, ")");
+	sprintf_s(sql, sizeof(sql), "%s%s%s%d%s%d%s%d%s%s%s%d%s%d%s%d%s%d%s%d%s%d%s%d%s%s%s", opresql, DR.tableid, ",", DR.header_0.length, ",", DR.request_id, ",", DR.requirement, ",'", satellite, "',", DR.time_begin[0], ",", DR.time_begin[1], ",", DR.time_begin_years, ",", DR.time_end[0], ",", DR.time_end[1], ",", DR.time_end_years, ",", DR.coor->num, ",", polysql, ")");
 	delete satellite;
 	cout << sql << endl;
 	char* Msg = "";
@@ -439,7 +439,7 @@ bool Database::InsertIntoClientRecvComd(DataRecv DR,int id)
 	return true;
 }
 
-bool Database::InsertIntoClientPostData2(DataRecv_RT_Response DRTR,int id)
+bool Database::InsertIntoClientPostData2(DataRecv_RT_Response DRTR)
 {
 	char *opresql = "INSERT INTO client_post_data_2 (id,data_size,satellite_name,ready) VALUES (";
 	char sql[1024];
@@ -449,7 +449,7 @@ bool Database::InsertIntoClientPostData2(DataRecv_RT_Response DRTR,int id)
 	size_t converted = 0;
 	satellite = (char*)malloc(len*sizeof(char));
 	wcstombs_s(&converted, satellite, len, DRTR.satellite, _TRUNCATE);
-	sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%s%s%d%s", opresql, id, ",", DRTR.header_0.length, ",'", satellite, "',", DRTR.state, ")");
+	sprintf_s(sql, sizeof(sql), "%s%s%s%d%s%s%s%d%s", opresql, DRTR.tableid, ",", DRTR.header_0.length, ",'", satellite, "',", DRTR.state, ")");
 	delete satellite;
 	cout << sql << endl;
 	char* Msg = "";
@@ -461,7 +461,7 @@ bool Database::InsertIntoClientPostData2(DataRecv_RT_Response DRTR,int id)
 	return true;
 }
 
-bool Database::InsertIntoClientSynData1235(DataRecv_RT_Response DRTR,int id)
+bool Database::InsertIntoClientSynData1235(DataRecv_RT_Response DRTR)
 {
 	char *opresql = "INSERT INTO client_syn_data_1235 (id,data_size,satellite_name,ready) VALUES (";
 	char sql[1024];
@@ -471,7 +471,7 @@ bool Database::InsertIntoClientSynData1235(DataRecv_RT_Response DRTR,int id)
 	size_t converted = 0;
 	satellite = (char*)malloc(len*sizeof(char));
 	wcstombs_s(&converted, satellite, len, DRTR.satellite, _TRUNCATE);
-	sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%s%s%d%s", opresql, id, ",", DRTR.header_0.length, ",'", satellite, "',", DRTR.state, ")");
+	sprintf_s(sql, sizeof(sql), "%s%s%s%d%s%s%s%d%s", opresql, DRTR.tableid, ",", DRTR.header_0.length, ",'", satellite, "',", DRTR.state, ")");
 	delete satellite;
 	cout << sql << endl;
 	char* Msg = "";
@@ -480,7 +480,7 @@ bool Database::InsertIntoClientSynData1235(DataRecv_RT_Response DRTR,int id)
 		cout << "insert error!" << endl;
 		return false;
 	}
-                                       	return true;
+    return true;
 }
 
 bool Database::InsertIntoClientSynData4(DataRecv_RT_Data DRTD)
@@ -491,10 +491,9 @@ bool Database::InsertIntoClientSynData4(DataRecv_RT_Data DRTD)
 	char *satellite;
 	size_t len = wcslen(DRTD.satellite) + 1;
 	size_t converted = 0;
-	int id = DRTD.path;
 	satellite = (char*)malloc(len*sizeof(char));
 	wcstombs_s(&converted, satellite, len, DRTD.satellite, _TRUNCATE);
-	sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%s%s%d%s%d%s%d%s%d%s%d%s%d%s%d%s", opresql, id, ",", DRTD.header_0.length, ",'", satellite, "',", DRTD.frame_header_length, ",", DRTD.frame_lenght, ",", DRTD.timeblock_length, ",", DRTD.tm_stateblock_length, ",", DRTD.tm_length, ",", DRTD.tm_number, ",'", DRTD.path, "')");
+	sprintf_s(sql, sizeof(sql), "%s%s%s%d%s%s%s%d%s%d%s%d%s%d%s%d%s%d%s%s%s", opresql, DRTD.tableid, ",", DRTD.header_0.length, ",'", satellite, "',", DRTD.frame_header_length, ",", DRTD.frame_lenght, ",", DRTD.timeblock_length, ",", DRTD.tm_stateblock_length, ",", DRTD.tm_length, ",", DRTD.tm_number, ",'", DRTD.path, "')");
 	delete satellite;
 	cout << sql << endl;
 	char* Msg = "";
@@ -514,10 +513,9 @@ bool Database::InsertIntoClientPostData1(DataRecv_RT_Data DRTD)
 	char *satellite;
 	size_t len = wcslen(DRTD.satellite) + 1;
 	size_t converted = 0;
-	int id = DRTD.path;
 	satellite = (char*)malloc(len*sizeof(char));
 	wcstombs_s(&converted, satellite, len, DRTD.satellite, _TRUNCATE);
-	sprintf_s(sql, sizeof(sql), "%s%d%s%d%s%s%s%d%s%d%s%d%s%d%s%d%s%d%s%d%s", opresql, id, ",", DRTD.header_0.length, ",'", satellite, "',", DRTD.frame_header_length, ",", DRTD.frame_lenght, ",", DRTD.timeblock_length, ",", DRTD.tm_stateblock_length, ",", DRTD.tm_length, ",", DRTD.tm_number, ",'", DRTD.path, "')");
+	sprintf_s(sql, sizeof(sql), "%s%s%s%d%s%s%s%d%s%d%s%d%s%d%s%d%s%d%s%s%s", opresql, DRTD.tableid, ",", DRTD.header_0.length, ",'", satellite, "',", DRTD.frame_header_length, ",", DRTD.frame_lenght, ",", DRTD.timeblock_length, ",", DRTD.tm_stateblock_length, ",", DRTD.tm_length, ",", DRTD.tm_number, ",'", DRTD.path, "')");
 	delete satellite;
 	cout << sql << endl;
 	char* Msg = "";

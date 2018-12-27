@@ -32,11 +32,11 @@ public:
 	bool InsertGeometry(int id, float *coor);
 	bool InsertIntoClientQueComd(DataQuery_0 DQ);
 	bool InsertIntoClientQueResp(DataQuery_0_Response DQR);
-	bool InsertIntoClientRecvComd(DataRecv DR,int id);
-	bool InsertIntoClientSynData1235(DataRecv_RT_Response DRTR,int id);
+	bool InsertIntoClientRecvComd(DataRecv DR);
+	bool InsertIntoClientSynData1235(DataRecv_RT_Response DRTR);
 	bool InsertIntoClientSynData4(DataRecv_RT_Data DRTD);
 	bool InsertIntoClientPostData1(DataRecv_RT_Data DRTD);
-	bool InsertIntoClientPostData2(DataRecv_RT_Response DRTR,int id);
+	bool InsertIntoClientPostData2(DataRecv_RT_Response DRTR);
 
 	///÷’∂À»Îø‚
 private:

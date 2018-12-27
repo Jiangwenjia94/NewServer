@@ -9,3 +9,4 @@ ftware\visualstudio2013\vc\atlmfc\include\afxtempl.h
 
 pl.h
 \visualstudio2013\vc\atlmfc\include\afxtempl.h
+vc\atlmfc\include\afxtempl.h

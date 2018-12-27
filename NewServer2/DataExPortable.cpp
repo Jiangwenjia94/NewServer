@@ -27,15 +27,23 @@ void PrintDQ(DataQuery_0 DQ)
 	std::cout << DQ.list_max << std::endl;
 	std::cout << DQ.end << std::endl;
 }
-void SetTime(int &ti, int Increment)			//时间，月份的增加量
+void SetTime(char *ti, int firnum)			//时间，首位
 {
+	/*******************************************************
+	发送数据接收指令 首位 : 1
+	事后数据1	 首位 : 2
+	事后数据2	 首位 : 3
+
+	实时数据1	 首位 : 4
+	实时数据2	 首位 : 5
+	实时数据3	 首位 : 6
+	实时数据4	 首位 : 7
+	实时数据5	 首位 : 8
+	*******************************************************/
 	SYSTEMTIME st = { 0 };
 	GetLocalTime(&st);
-	ti = (st.wMonth + Increment) * 100000000;
-	ti += st.wDay * 1000000;
-	ti += st.wHour * 10000;
-	ti += st.wMinute * 100;
-	ti += st.wSecond;
+	int i = sizeof(ti);
+	sprintf_s(ti, 30, "%d%d%d%d%d%d%d", firnum, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond,st.wMilliseconds);
 }
 
 
@@ -436,30 +444,44 @@ int DataExPortable::DataRec(bool isfir)
 	coordinate[9] = 5.001;
 	msg.length = 248 + (2 * num + 1) * 4;
 //	msg.length = 0;
-	SetDataRecvOrder(DR, msg, 1, 4, 5, L"abcd", ttime, 5, coordinate);
+	SetDataRecvOrder(DR, msg, 1, 3, 5, L"abcd", ttime, 5, coordinate);
 
 	bool isfin = false;
 	int senlength = 0;
 	int headlength = 0;
 	int recvlength = 0;
-	int tableid = 0;
-	while (1)
-	{
-	//	int c = 0;
-	//	cin >> c;
+	char tableid[30];
+	memset(tableid, 0, sizeof(tableid));
+//	while (1)
+//	{
 		headlength = SendMsgHed(msg);
 		senlength = SendDataRecvOrder(msg, DR);		//发送数据接收指令
 		if (senlength + headlength == msg.length)
 		{
-			SetTime(tableid, 0);
-			if (!DB.InsertIntoClientRecvComd(DR,tableid))
+			SetTime(DR.tableid, 1);
+			if (!DB.InsertIntoClientRecvComd(DR))
 				cout << "insert ClientRecvComd error!" << endl;
 		}
 		else
 		{
 			return 0;
 		}
-
+		//存放此次数据
+		char cpath[30];
+		memset(cpath,0,sizeof(cpath));
+		SetTime(cpath,0);
+		CString cspath;
+		cspath.Format(_T("%s"), CStringW(cpath));
+		if (!PathIsDirectory(cspath))
+		{
+			CreateDirectory(cspath, NULL);
+			cout << "创建成功" << endl;
+		}
+		else
+		{
+			cout << "fail" << endl;
+		}
+		//
 		if (1/*rec > 0 && rec_msg.length != 24*/)		//数据可以发送则开始接收
 		{
 			if (DR.request_id == 3)					//事后数据接收
@@ -477,20 +499,20 @@ int DataExPortable::DataRec(bool isfir)
 					if (headrec <= 0)
 						break;
 			//		sprintf_s(ADRTD[count].path, sizeof(ADRTD[count].path),"%d",count);
-					SetTime(tableid, 2);
-					ADRTD[count].path = tableid;
-					int ADRTR_length1 = RecvRTData(AHead, ADRTD[count]);
+					SetTime(ADRTD[count].tableid, 2);
+					sprintf_s(ADRTD[count].path, 30, "%s%s%s", cpath, "/", ADRTD[count].tableid);
+					int ADRTR_length1 = RecvRTData(AHead, ADRTD[count],cpath);
 					if (ADRTR_length1 + headrec != AHead.length)
 						break;
-					if (DB.InsertIntoClientPostData1(ADRTD[count]))
+					if (!DB.InsertIntoClientPostData1(ADRTD[count]))
 						cout << "insert ClientPostData1 error!" << endl;
 					count++;  
 				}
 				int ADRTR_length2 = RecvRTResponse(AHead, ADRTR);
 				if (ADRTR_length2 + headrec != AHead.length)	//接收事后数据接收响应-2
-					break;
-				SetTime(tableid, 3);
-				if(DB.InsertIntoClientPostData2(ADRTR,tableid))
+					return -1;
+				SetTime(ADRTR.tableid, 3);
+				if(!DB.InsertIntoClientPostData2(ADRTR))
 					cout << "insert ClientPostData2 error!" << endl;
 			}
 			else if (DR.request_id == 4)			//实时数据接收
@@ -508,8 +530,8 @@ int DataExPortable::DataRec(bool isfir)
 					int DRTR_length123 = RecvRTResponse(DRRTHead[i], DRTR[i]);
 					if (DRTR_length123 + headrec != DRRTHead[i].length)
 						break;
-					SetTime(tableid, i + 4);
-					if (!DB.InsertIntoClientSynData1235(DRTR[i], tableid + i))
+					SetTime(DRTR[i].tableid, i + 4);
+					if (!DB.InsertIntoClientSynData1235(DRTR[i]))
 						cout << "insert ClientSynData1235 error!" << endl;
 
 				}									//实时数据接收响应-1-2-3接收完成
@@ -521,9 +543,9 @@ int DataExPortable::DataRec(bool isfir)
 						break;
 					if (headrec <= 0)
 						break;
-					SetTime(tableid, 7);
-					DRTD[count].path = tableid;
-					int DRTR_length4 = RecvRTData(Data4Head, DRTD[count]);
+					SetTime(DRTD[count].tableid, 7);
+					sprintf_s(DRTD[count].path, 30, "%s%s%s", cpath, "/", DRTD[count].tableid);
+					int DRTR_length4 = RecvRTData(Data4Head, DRTD[count], cpath);
 					if (DRTR_length4 + headrec != Data4Head.length)
 						break;
 					if (!DB.InsertIntoClientSynData4(DRTD[count]))
@@ -532,9 +554,9 @@ int DataExPortable::DataRec(bool isfir)
 				}
 				int DRTR_length5 = RecvRTResponse(Data4Head, DRTR[3]);
 				if (DRTR_length5 + headrec != Data4Head.length)	//接收实时数据接收响应-5
-					break;
-				SetTime(tableid, 8);
-				if (!DB.InsertIntoClientSynData1235(DRTR[3], tableid))
+					return -1;
+				SetTime(DRTR[3].tableid, 8);
+				if (!DB.InsertIntoClientSynData1235(DRTR[3]))
 					cout << "insert ClientSynData1235 error!" << endl;
 			}
 		}
@@ -542,10 +564,13 @@ int DataExPortable::DataRec(bool isfir)
 		{
 			int frec = RecvFailOrder(rec_msg,DRF);	
 			if (frec <= 0)
+			{
 				cout << "recv failed" << endl;
+				return -1;
+			}
 		}
          
-	}
+//	}
 
 	return rec;
 }
@@ -686,7 +711,7 @@ int DataExPortable::RecvRTResponse(MsgHeader mh, DataRecv_RT_Response &RTR)
 	return recv_length;
 }
 
-int DataExPortable::RecvRTData(MsgHeader mh, DataRecv_RT_Data &RTD)
+int DataExPortable::RecvRTData(MsgHeader mh, DataRecv_RT_Data &RTD, char *prepath)
 {
 	int tm_length;
 	int rec = 0;
@@ -747,7 +772,7 @@ int DataExPortable::RecvRTData(MsgHeader mh, DataRecv_RT_Data &RTD)
 	bool datatype = 1;
 	if (RTD.frame_header_length != 0)
 		datatype = 0;
-	recv_length += RecvTMData(RTD.tm_length,RTD,datatype);
+	recv_length += RecvTMData(RTD.tm_length,RTD,datatype,prepath);
 
 	rec = Trans.Recv(RTD.end);
 	if (rec <= 0)
@@ -760,7 +785,7 @@ int DataExPortable::RecvRTData(MsgHeader mh, DataRecv_RT_Data &RTD)
 	return recv_length;
 }
 
-int DataExPortable::RecvTMData(int datasize, DataRecv_RT_Data &RTD, bool datatype)
+int DataExPortable::RecvTMData(int datasize, DataRecv_RT_Data &RTD, bool datatype, char *prepath)
 {
 	int recv_length = 0;
 	int rec = 0;
@@ -780,7 +805,7 @@ int DataExPortable::RecvTMData(int datasize, DataRecv_RT_Data &RTD, bool datatyp
 	RTD.TMB = new TMBlock[RTD.tm_number];
 	char temp[1024] = { 0 };
 	CString path;
-	path.Format(_T("%d"), RTD.path);
+	path.Format(_T("%s%s%s"), CStringW(prepath), "/", CStringW(RTD.tableid));
 	if (!PathIsDirectory(path))
 	{
 		CreateDirectory(path, NULL);
@@ -881,11 +906,12 @@ int DataExPortable::RecvTMData(int datasize, DataRecv_RT_Data &RTD, bool datatyp
 				return -1;
 			recv_length += rec;
 
-			cout << "**recv_length:" << RTD.path<<" : "<<recv_length << endl;
+	//		cout << "**recv_length:" << RTD.tableid<<" : "<<recv_length << endl;
 		}
+		
 		file.Close();
 	}
-
+	cout << "path: " << path << endl;
 
 	return recv_length                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ;
 }

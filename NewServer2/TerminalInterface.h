@@ -107,10 +107,11 @@ struct DataRecv					//3.6.1 数据接收指令 length = 256
 	Coor *coor;
 	int placeholder[39];			//保留值
 	int end = -1234567890;		//消息尾
-
+	char tableid[30];
 	DataRecv()
 	{
 		memset(placeholder, 0, sizeof(placeholder));
+		memset(tableid, 0, sizeof(tableid));
 	}
 };
 
@@ -130,6 +131,12 @@ struct DataRecv_RT_Response		//3.6.3 实时数据接收响应-1-2-3-5 事后数据响应2 leng
 	int state;				//卫星状态
 	int placeholder[4];			//保留值
 	int end;			//消息尾
+	char tableid[30];
+	DataRecv_RT_Response()
+	{
+		memset(placeholder, 0, sizeof(placeholder));
+		memset(tableid, 0, sizeof(tableid));
+	}
 };
 
 
@@ -159,7 +166,14 @@ struct DataRecv_RT_Data		//3.6.6 实时数据接收响应-4  3.6.8事后数据响应1
 	int placeholder[43];
 	TMBlock *TMB;
 	int end;
-	int path;
+	char tableid[30];
+	char path[30];				//TBVBlock的保存路径
+	DataRecv_RT_Data()
+	{
+		memset(placeholder, 0, sizeof(placeholder));
+		memset(tableid, 0, sizeof(tableid));
+		memset(path, 0, sizeof(path));
+	}
 };
 
 
